@@ -281,7 +281,7 @@ var denominations = [
   { label:  '200 CZK', value: 200  },
   { label:  '100 CZK', value: 100  }
 ];
-var scriptUrl = '';
+var scriptUrl = 'https://script.google.com/macros/s/AKfycbwmfPJVnEXpEXBR8ZMV-GXLCC1F5JD6meZWLQOREPwTEIbveG3Evbz2_3Fxe-jQAauj/exec';
 
 function fmt(n) { return Math.round(n).toLocaleString('cs-CZ') + ' CZK'; }
 
@@ -467,7 +467,8 @@ function resetAll() {
   updateRunning(); goTo(1);
 }
 
-try{ var saved=localStorage.getItem('till_script_url_v4'); if(saved){ scriptUrl=saved; goTo(1); } }catch(e){}
+try{ localStorage.setItem('till_script_url_v4', scriptUrl); }catch(e){}
+goTo(1);
 document.getElementById('date').value=new Date().toISOString().split('T')[0];
 buildTable();
 </script>
