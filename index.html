@@ -170,12 +170,13 @@
       </thead>
       <tbody id="notes-tbody"></tbody>
     </table>
-    <div style="background:#f9f9f7;border-radius:10px;padding:1rem 1.25rem;border:1px solid #ebebeb;margin-bottom:1.25rem;">
-      <p style="font-size:13px;color:#666;margin:0 0 8px 0;padding:0;">Coins — total amount (CZK)</p>
-      <div style="width:100%;display:block;">
-        <input type="number" id="coins-total" placeholder="e.g. 450" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateRunning()" style="display:block;width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:18px;font-family:inherit;color:#1a1a1a;outline:none;background:#fff;box-sizing:border-box;" />
-      </div>
-    </div>
+    <div class="section-label" style="margin-top:1rem;">Coins — enter quantity</div>
+    <table class="denom-table">
+      <thead>
+        <tr><th>Coin</th><th>Qty</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody id="coins-tbody"></tbody>
+    </table>
     <div class="running-total">
       <div class="running-row">
         <span class="running-label">Banknotes</span>
@@ -257,6 +258,7 @@
       <div class="breakdown-row"><span class="breakdown-key">Opening float</span><span class="breakdown-val" id="s-float"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Cash sales (POS)</span><span class="breakdown-val" id="s-cash"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Card sales (POS)</span><span class="breakdown-val" id="s-card"></span></div>
+      <div class="breakdown-row"><span class="breakdown-key">Tips</span><span class="breakdown-val" id="s-tips"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Banknotes counted</span><span class="breakdown-val" id="s-notes-sub"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Coins counted</span><span class="breakdown-val" id="s-coins-sub"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Expected in till</span><span class="breakdown-val" id="s-expected"></span></div>
@@ -281,6 +283,14 @@ var denominations = [
   { label:  '200 CZK', value: 200  },
   { label:  '100 CZK', value: 100  }
 ];
+var coins = [
+  { label: '50 CZK', value: 50 },
+  { label: '20 CZK', value: 20 },
+  { label: '10 CZK', value: 10 },
+  { label:  '5 CZK', value: 5  },
+  { label:  '2 CZK', value: 2  },
+  { label:  '1 CZK', value: 1  }
+];
 var scriptUrl = 'https://script.google.com/macros/s/AKfycbwmfPJVnEXpEXBR8ZMV-GXLCC1F5JD6meZWLQOREPwTEIbveG3Evbz2_3Fxe-jQAauj/exec';
 
 function fmt(n) { return Math.round(n).toLocaleString('cs-CZ') + ' CZK'; }
@@ -292,7 +302,9 @@ function getQty(label) {
 function getNotesTotal() {
   return denominations.reduce(function(sum,d){ return sum + getQty(d.label)*d.value; }, 0);
 }
-function getCoinsTotal() { return parseFloat(document.getElementById('coins-total').value)||0; }
+function getCoinsTotal() {
+  return coins.reduce(function(sum,d){ return sum + getQty(d.label)*d.value; }, 0);
+}
 function getTotal() { return getNotesTotal()+getCoinsTotal(); }
 
 function updateRow(label,value) {
@@ -328,6 +340,17 @@ function buildTable() {
       '<td class="denom-subtotal" id="sub-'+id+'">—</td>';
     tbody.appendChild(tr);
   });
+  var ctbody = document.getElementById('coins-tbody');
+  coins.forEach(function(d){
+    var id = d.label.replace(/\s/g,'');
+    var tr = document.createElement('tr');
+    tr.className = 'denom-row';
+    tr.innerHTML =
+      '<td class="denom-name">'+d.label+'</td>'+
+      '<td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-'+id+'" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(\''+d.label+'\','+d.value+')" /></div></td>'+
+      '<td class="denom-subtotal" id="sub-'+id+'">—</td>';
+    ctbody.appendChild(tr);
+  });
 }
 
 function buildSummary() {
@@ -337,12 +360,14 @@ function buildSummary() {
   var actual   = getTotal();
   var expected = fl+cash;
   var variance = actual-expected;
+  var tips     = variance > 5 ? variance : 0;
 
   document.getElementById('s-date').textContent     = document.getElementById('date').value||'—';
   document.getElementById('s-staff').textContent    = document.getElementById('staff').value||'—';
   document.getElementById('s-float').textContent    = fmt(fl);
   document.getElementById('s-cash').textContent     = fmt(cash);
   document.getElementById('s-card').textContent     = fmt(card);
+  document.getElementById('s-tips').textContent     = tips > 0 ? fmt(tips) : '—';
   document.getElementById('s-notes-sub').textContent= fmt(getNotesTotal());
   document.getElementById('s-coins-sub').textContent= fmt(getCoinsTotal());
   document.getElementById('s-expected').textContent = fmt(expected);
@@ -351,19 +376,21 @@ function buildSummary() {
 
   var vc = document.getElementById('variance-card');
   vc.className = 'variance-card';
-  document.getElementById('variance-display').textContent = (variance>=0?'+':'')+fmt(variance);
   if(Math.abs(variance)<=5){
+    document.getElementById('variance-display').textContent = '0 CZK';
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='All balanced';
     document.getElementById('variance-msg').textContent='Till matches expected. Great close!';
   } else if(variance<0){
+    document.getElementById('variance-display').textContent = fmt(variance);
     vc.classList.add('warn');
     document.getElementById('variance-label').textContent='Till is short';
     document.getElementById('variance-msg').textContent='Missing '+fmt(Math.abs(variance))+' — check for errors or missed sales.';
   } else {
-    vc.classList.add('over');
-    document.getElementById('variance-label').textContent='Till is over';
-    document.getElementById('variance-msg').textContent=fmt(variance)+' over expected — worth checking.';
+    document.getElementById('variance-display').textContent = fmt(tips);
+    vc.classList.add('ok');
+    document.getElementById('variance-label').textContent='Tips';
+    document.getElementById('variance-msg').textContent='Put '+fmt(tips)+' in the tips envelope. Float goes back to safe.';
   }
 
   var btn = document.getElementById('submit-btn');
@@ -380,11 +407,12 @@ async function submitToSheet() {
   var cash = parseFloat(document.getElementById('cash-sales').value)||0;
   var card = parseFloat(document.getElementById('card-sales').value)||0;
   var actual=getTotal(), expected=fl+cash, variance=actual-expected;
-  var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'Over';
+  var tips = variance > 5 ? variance : 0;
+  var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'Tips: '+Math.round(tips)+' CZK';
   try {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
-        float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),
+        float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),tips:Math.round(tips),
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
         status:status,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
@@ -460,7 +488,7 @@ function goTo(n) {
 }
 
 function resetAll() {
-  ['staff','float','card-sales','cash-sales','notes','coins-total'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['staff','float','card-sales','cash-sales','notes'].forEach(function(id){ document.getElementById(id).value=''; });
   document.querySelectorAll('.denom-qty').forEach(function(el){ el.value=''; });
   document.querySelectorAll('.denom-subtotal').forEach(function(el){ el.textContent='—'; el.className='denom-subtotal'; });
   document.getElementById('date').value=new Date().toISOString().split('T')[0];
