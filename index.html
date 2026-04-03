@@ -207,15 +207,15 @@
     </div>
     <div class="pos-box">
       <div class="pos-row">
-        <span class="pos-label">Card sales (CZK)</span>
+        <span class="pos-label"><strong>CARD</strong> (CZK)</span>
         <input type="number" class="pos-input" id="card-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
       </div>
       <div class="pos-row">
-        <span class="pos-label">Cash sales — POS (CZK)</span>
+        <span class="pos-label"><strong>CASH</strong> (CZK)</span>
         <input type="number" class="pos-input" id="cash-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
       </div>
       <div class="pos-row">
-        <span class="pos-label">Total POS turnover</span>
+        <span class="pos-label">Total</span>
         <span class="pos-val" id="pos-total">0 CZK</span>
       </div>
     </div>
@@ -276,6 +276,16 @@
     <div class="actions" style="margin-top:8px;">
       <button class="btn-secondary" onclick="goTo(3)">← Edit</button>
       <button class="btn-secondary" onclick="resetAll()">New close</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Thank you -->
+  <div class="step" id="step5">
+    <div style="text-align:center; padding:2rem 1rem;">
+      <div style="font-size:48px; margin-bottom:1rem;">☕</div>
+      <div style="font-size:22px; font-weight:700; color:#1a1a1a; margin-bottom:8px;">Thank you for today!</div>
+      <div style="font-size:15px; color:#888; margin-bottom:2rem; line-height:1.6;">Till is closed and logged.<br>See you tomorrow!</div>
+      <button class="btn-primary" onclick="resetAll()" style="max-width:240px; margin:0 auto; display:block;">Start new close</button>
     </div>
   </div>
 
@@ -439,6 +449,7 @@ async function submitToSheet() {
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
         status:status,acknowledged:acknowledged,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
+    setTimeout(function(){ goTo(5); }, 1000);
   } catch(err){
     btn.textContent='Error — check your URL'; btn.className='submit-btn error'; btn.disabled=false;
   }
