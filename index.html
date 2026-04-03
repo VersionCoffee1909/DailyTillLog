@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0060)file:///Users/kcn_sharpgrid/Downloads/Till%20Close%20v4.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Till Close">
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Till Close" />
 <title>Till Close</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -113,12 +113,12 @@
 <div class="app">
 
   <!-- Step 0: Setup -->
-  <div class="step" id="step0">
+  <div class="step active" id="step0">
     <div class="page-title">Google Sheets setup</div>
     <div class="info-box">Paste your Google Apps Script Web App URL below. You only need to do this once — it is saved in your browser.</div>
     <div class="field-group">
       <label>Apps Script Web App URL</label>
-      <input type="url" id="script-url-input" class="url-input" placeholder="https://script.google.com/macros/s/.../exec">
+      <input type="url" id="script-url-input" class="url-input" placeholder="https://script.google.com/macros/s/.../exec" />
     </div>
     <div class="actions">
       <button class="btn-primary" onclick="saveUrl()">Save &amp; continue →</button>
@@ -127,7 +127,7 @@
   </div>
 
   <!-- Step 1: Info -->
-  <div class="step active" id="step1">
+  <div class="step" id="step1">
     <div class="page-title">
       Till close
       <div class="step-indicator">
@@ -135,18 +135,18 @@
       </div>
     </div>
     <div id="hs-banner-wrap"></div>
-    <div class="url-banner" id="url-banner"><span class="url-status linked">✓ Linked to Google Sheets</span><button class="url-edit-btn" onclick="goTo(0)">Change</button></div>
+    <div class="url-banner" id="url-banner"></div>
     <div class="field-group">
       <label>Date</label>
-      <input type="date" id="date">
+      <input type="date" id="date" />
     </div>
     <div class="field-group">
       <label>Staff name</label>
-      <input type="text" id="staff" placeholder="Your name">
+      <input type="text" id="staff" placeholder="Your name" />
     </div>
     <div class="field-group">
       <label>Opening float (CZK)</label>
-      <input type="number" id="float" placeholder="e.g. 3000" min="0" step="1" inputmode="numeric" pattern="[0-9]*">
+      <input type="number" id="float" placeholder="e.g. 3000" min="0" step="1" inputmode="numeric" pattern="[0-9]*" />
     </div>
     <div class="actions">
       <button class="btn-primary" onclick="goTo(2)">Next →</button>
@@ -168,12 +168,12 @@
           <th>Note</th><th>Qty</th><th>Subtotal</th>
         </tr>
       </thead>
-      <tbody id="notes-tbody"><tr class="denom-row"><td class="denom-name">5000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-5000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;5000 CZK&#39;,5000)"></div></td><td class="denom-subtotal" id="sub-5000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">2000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-2000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;2000 CZK&#39;,2000)"></div></td><td class="denom-subtotal" id="sub-2000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">1000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-1000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;1000 CZK&#39;,1000)"></div></td><td class="denom-subtotal" id="sub-1000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">500 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-500CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;500 CZK&#39;,500)"></div></td><td class="denom-subtotal" id="sub-500CZK">—</td></tr><tr class="denom-row"><td class="denom-name">200 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-200CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;200 CZK&#39;,200)"></div></td><td class="denom-subtotal" id="sub-200CZK">—</td></tr><tr class="denom-row"><td class="denom-name">100 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-100CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;100 CZK&#39;,100)"></div></td><td class="denom-subtotal" id="sub-100CZK">—</td></tr><tr class="denom-row"><td class="denom-name">5000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-5000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;5000 CZK&#39;,5000)"></div></td><td class="denom-subtotal" id="sub-5000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">2000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-2000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;2000 CZK&#39;,2000)"></div></td><td class="denom-subtotal" id="sub-2000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">1000 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-1000CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;1000 CZK&#39;,1000)"></div></td><td class="denom-subtotal" id="sub-1000CZK">—</td></tr><tr class="denom-row"><td class="denom-name">500 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-500CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;500 CZK&#39;,500)"></div></td><td class="denom-subtotal" id="sub-500CZK">—</td></tr><tr class="denom-row"><td class="denom-name">200 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-200CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;200 CZK&#39;,200)"></div></td><td class="denom-subtotal" id="sub-200CZK">—</td></tr><tr class="denom-row"><td class="denom-name">100 CZK</td><td><div class="denom-input-wrap"><input type="number" class="denom-qty" id="qty-100CZK" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="updateRow(&#39;100 CZK&#39;,100)"></div></td><td class="denom-subtotal" id="sub-100CZK">—</td></tr></tbody>
+      <tbody id="notes-tbody"></tbody>
     </table>
     <div style="background:#f9f9f7;border-radius:10px;padding:1rem 1.25rem;border:1px solid #ebebeb;margin-bottom:1.25rem;">
       <p style="font-size:13px;color:#666;margin:0 0 8px 0;padding:0;">Coins — total amount (CZK)</p>
       <div style="width:100%;display:block;">
-        <input type="number" id="coins-total" placeholder="e.g. 450" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateRunning()" style="display:block;width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:18px;font-family:inherit;color:#1a1a1a;outline:none;background:#fff;box-sizing:border-box;">
+        <input type="number" id="coins-total" placeholder="e.g. 450" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateRunning()" style="display:block;width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:18px;font-family:inherit;color:#1a1a1a;outline:none;background:#fff;box-sizing:border-box;" />
       </div>
     </div>
     <div class="running-total">
@@ -207,11 +207,11 @@
     <div class="pos-box">
       <div class="pos-row">
         <span class="pos-label">Card sales (CZK)</span>
-        <input type="number" class="pos-input" id="card-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()">
+        <input type="number" class="pos-input" id="card-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
       </div>
       <div class="pos-row">
         <span class="pos-label">Cash sales — POS (CZK)</span>
-        <input type="number" class="pos-input" id="cash-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()">
+        <input type="number" class="pos-input" id="cash-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
       </div>
       <div class="pos-row">
         <span class="pos-label">Total POS turnover</span>
@@ -471,6 +471,5 @@ try{ var saved=localStorage.getItem('till_script_url_v4'); if(saved){ scriptUrl=
 document.getElementById('date').value=new Date().toISOString().split('T')[0];
 buildTable();
 </script>
-
-
-</body></html>
+</body>
+</html>
