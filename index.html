@@ -380,17 +380,17 @@ function buildSummary() {
     document.getElementById('variance-display').textContent = '0 CZK';
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='All balanced';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' — Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Float '+fmt(fl)+' stays in till.';
   } else if(variance<0){
     document.getElementById('variance-display').textContent = fmt(variance);
     vc.classList.add('warn');
     document.getElementById('variance-label').textContent='Till is short';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Short: '+fmt(Math.abs(variance))+' must be paid by staff.';
+    document.getElementById('variance-msg').textContent='Short: '+fmt(Math.abs(variance))+' · To safe: '+fmt(cash)+' · Difference must be paid by staff.';
   } else {
     document.getElementById('variance-display').textContent = fmt(tips);
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='Tips';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips: '+fmt(tips)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-msg').textContent='Tips: '+fmt(tips)+' · To safe: '+fmt(cash)+' · Float '+fmt(fl)+' stays in till.';
   }
 
   var btn = document.getElementById('submit-btn');
