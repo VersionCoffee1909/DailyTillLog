@@ -385,7 +385,7 @@ function buildSummary() {
     document.getElementById('variance-display').textContent = fmt(variance);
     vc.classList.add('warn');
     document.getElementById('variance-label').textContent='Till is short';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash+variance)+' — Short '+fmt(Math.abs(variance))+' must be made up by staff.';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Short: '+fmt(Math.abs(variance))+' must be paid by staff.';
   } else {
     document.getElementById('variance-display').textContent = fmt(tips);
     vc.classList.add('ok');
@@ -408,7 +408,7 @@ async function submitToSheet() {
   var card = parseFloat(document.getElementById('card-sales').value)||0;
   var actual=getTotal(), expected=fl+cash, variance=actual-expected;
   var tips = variance > 5 ? variance : 0;
-  var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'Tips: '+Math.round(tips)+' CZK';
+  var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'OK';
   try {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
