@@ -265,7 +265,13 @@
       <div class="breakdown-row"><span class="breakdown-key">Actual counted</span><span class="breakdown-val" id="s-actual"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Notes</span><span class="breakdown-val" id="s-notes-txt" style="max-width:55%;text-align:right;font-size:12px;font-weight:400;"></span></div>
     </div>
-    <button class="submit-btn" id="submit-btn" onclick="submitToSheet()">Log to Google Sheets</button>
+    <div id="ack-wrap" style="display:none; background:#fcebeb; border:1px solid #f7c1c1; border-radius:10px; padding:14px 16px; margin-bottom:12px;">
+      <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
+        <input type="checkbox" id="ack-checkbox" onchange="toggleSubmit()" style="margin-top:3px; width:18px; height:18px; flex-shrink:0; cursor:pointer;" />
+        <span style="font-size:13px; color:#791F1F; line-height:1.5;">Got it — I know the till is short and will settle with Tatiana.</span>
+      </label>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitToSheet()">All done</button>
     <button class="copy-btn" onclick="copyReport()">Copy report to clipboard</button>
     <div class="actions" style="margin-top:8px;">
       <button class="btn-secondary" onclick="goTo(3)">← Edit</button>
@@ -292,6 +298,12 @@ var coins = [
   { label:  '1 CZK', value: 1  }
 ];
 var scriptUrl = 'https://script.google.com/macros/s/AKfycbwmfPJVnEXpEXBR8ZMV-GXLCC1F5JD6meZWLQOREPwTEIbveG3Evbz2_3Fxe-jQAauj/exec';
+
+function toggleSubmit() {
+  var ackBox = document.getElementById('ack-checkbox');
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = !ackBox.checked;
+}
 
 function fmt(n) { return Math.round(n).toLocaleString('cs-CZ') + ' CZK'; }
 
@@ -394,9 +406,18 @@ function buildSummary() {
   }
 
   var btn = document.getElementById('submit-btn');
-  btn.disabled = !scriptUrl;
+  var ackWrap = document.getElementById('ack-wrap');
+  var ackBox = document.getElementById('ack-checkbox');
+  ackBox.checked = false;
+  if(variance < -5) {
+    ackWrap.style.display = 'block';
+    btn.disabled = true;
+  } else {
+    ackWrap.style.display = 'none';
+    btn.disabled = !scriptUrl;
+  }
   btn.className = 'submit-btn';
-  btn.textContent = scriptUrl ? 'Submit & done' : 'No Sheet linked — set up first';
+  btn.textContent = scriptUrl ? 'All done' : 'No Sheet linked — set up first';
 }
 
 async function submitToSheet() {
@@ -408,13 +429,15 @@ async function submitToSheet() {
   var card = parseFloat(document.getElementById('card-sales').value)||0;
   var actual=getTotal(), expected=fl+cash, variance=actual-expected;
   var tips = variance > 5 ? variance : 0;
+  var ackBox = document.getElementById('ack-checkbox');
+  var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
   var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'OK';
   try {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
         float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),tips:Math.round(tips),
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
-        status:status,notes:document.getElementById('notes').value||''})});
+        status:status,acknowledged:acknowledged,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
   } catch(err){
     btn.textContent='Error — check your URL'; btn.className='submit-btn error'; btn.disabled=false;
