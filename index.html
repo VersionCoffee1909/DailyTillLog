@@ -459,6 +459,8 @@ async function submitToSheet() {
   var expected = fl + cash;
   var variance = actual - expected;
   var cashTips = variance > 0 ? variance : 0;
+  var shortAmt = variance < 0 ? Math.abs(variance) : 0;
+  var actualToSafe = toEnvelope + (variance < 0 ? variance : 0);
   var ackBox = document.getElementById('ack-checkbox');
   var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
   var status = variance < 0 ? 'Short' : 'OK';
@@ -466,7 +468,7 @@ async function submitToSheet() {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
         float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),
-        tipsPretax:Math.round(tipsPre),tipsOut:tipsOut,toSafe:toEnvelope,
+        tipsPretax:Math.round(tipsPre),tipsOut:tipsOut,toSafe:actualToSafe,shortAmt:shortAmt,
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
         status:status,cashTips:cashTips,acknowledged:acknowledged,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
