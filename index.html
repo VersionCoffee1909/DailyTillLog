@@ -354,8 +354,9 @@ function updateExpected() {
   var tipsPre   = parseFloat(document.getElementById('tips-pretax').value)||0;
   var tipsOut   = Math.round(tipsPre * 0.85);
   var fl        = parseFloat(document.getElementById('float').value)||0;
+  var toEnvelope = Math.round(cash - tipsOut);
   document.getElementById('tips-cashout').textContent = fmt(tipsOut);
-  document.getElementById('expected-till').textContent = fmt(fl + cash - tipsOut);
+  document.getElementById('expected-till').textContent = fmt(fl + toEnvelope);
   document.getElementById('actual-display').textContent = fmt(getTotal());
   document.getElementById('pos-total').textContent = fmt(cash + card);
 }
@@ -392,7 +393,8 @@ function buildSummary() {
   var tipsPre  = parseFloat(document.getElementById('tips-pretax').value)||0;
   var tipsOut  = Math.round(tipsPre * 0.85);
   var actual   = getTotal();
-  var expected = fl + cash - tipsOut;
+  var toEnvelope = Math.round(cash - tipsOut);
+  var expected = fl + toEnvelope;
   var variance = actual - expected;
 
   document.getElementById('s-date').textContent      = document.getElementById('date').value||'—';
@@ -449,7 +451,8 @@ async function submitToSheet() {
   var tipsPre = parseFloat(document.getElementById('tips-pretax').value)||0;
   var tipsOut = Math.round(tipsPre * 0.85);
   var actual  = getTotal();
-  var expected = fl + cash - tipsOut;
+  var toEnvelope = Math.round(cash - tipsOut);
+  var expected = fl + toEnvelope;
   var variance = actual - expected;
   var ackBox = document.getElementById('ack-checkbox');
   var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
