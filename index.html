@@ -412,7 +412,7 @@ function buildSummary() {
   var aboveFloat = Math.round(actual - fl);
   var vc = document.getElementById('variance-card');
   vc.className = 'variance-card';
-  if(Math.abs(variance)<=5){
+  if(Math.abs(variance)<=10){
     document.getElementById('variance-display').textContent = fmt(toEnvelope);
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='To safe';
@@ -433,7 +433,7 @@ function buildSummary() {
   var ackWrap = document.getElementById('ack-wrap');
   var ackBox = document.getElementById('ack-checkbox');
   ackBox.checked = false;
-  if(variance < -5) {
+  if(variance < -10) {
     ackWrap.style.display = 'block';
     btn.disabled = true;
   } else {
@@ -458,7 +458,7 @@ async function submitToSheet() {
   var variance = actual - expected;
   var ackBox = document.getElementById('ack-checkbox');
   var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
-  var status = Math.abs(variance)<=5?'OK':variance<0?'Short':'OK';
+  var status = Math.abs(variance)<=10?'OK':variance<0?'Short':'OK';
   try {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
