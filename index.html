@@ -356,7 +356,7 @@ function updateExpected() {
   var fl        = parseFloat(document.getElementById('float').value)||0;
   var toEnvelope = Math.round(cash - tipsOut);
   document.getElementById('tips-cashout').textContent = fmt(tipsOut);
-  document.getElementById('expected-till').textContent = fmt(fl + toEnvelope);
+  document.getElementById('expected-till').textContent = fmt(fl + cash);
   document.getElementById('actual-display').textContent = fmt(getTotal());
   document.getElementById('pos-total').textContent = fmt(cash + card);
 }
@@ -392,10 +392,10 @@ function buildSummary() {
   var card     = parseFloat(document.getElementById('card-sales').value)||0;
   var tipsPre  = parseFloat(document.getElementById('tips-pretax').value)||0;
   var tipsOut  = Math.round(tipsPre * 0.85);
-  var actual   = getTotal();
+  var actual     = getTotal();
   var toEnvelope = Math.round(cash - tipsOut);
-  var expected = fl + toEnvelope;
-  var variance = actual - expected;
+  var expected   = fl + cash;
+  var variance   = actual - expected;
 
   document.getElementById('s-date').textContent      = document.getElementById('date').value||'—';
   document.getElementById('s-staff').textContent     = document.getElementById('staff').value||'—';
@@ -410,20 +410,24 @@ function buildSummary() {
   document.getElementById('s-actual').textContent    = fmt(actual);
   document.getElementById('s-notes-txt').textContent = document.getElementById('notes').value||'—';
 
-  var toEnvelope = Math.round(cash - tipsOut);
   var aboveFloat = Math.round(actual - fl);
   var vc = document.getElementById('variance-card');
   vc.className = 'variance-card';
-  if(variance >= 0){
+  if(variance === 0){
     document.getElementById('variance-display').textContent = fmt(toEnvelope);
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='To safe';
-    document.getElementById('variance-msg').textContent='Extra cash tips: '+fmt(variance)+' · Tip card (all day): '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-msg').textContent='Float '+fmt(fl)+' stays in till.';
+  } else if(variance > 0){
+    document.getElementById('variance-display').textContent = fmt(toEnvelope + variance);
+    vc.classList.add('ok');
+    document.getElementById('variance-label').textContent='Current state';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(toEnvelope)+' · Extra cash: '+fmt(variance);
   } else {
-    document.getElementById('variance-display').textContent = fmt(toEnvelope);
+    document.getElementById('variance-display').textContent = fmt(toEnvelope + variance);
     vc.classList.add('warn');
-    document.getElementById('variance-label').textContent='To safe';
-    document.getElementById('variance-msg').textContent='⚠️ Current in till: '+fmt(aboveFloat)+' · Short: '+fmt(Math.abs(variance))+' — must be settled with Tatiana · Tip card (all day): '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-label').textContent='Current state';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(toEnvelope)+' · ⚠️ Staff needs to pay: '+fmt(Math.abs(variance));
   }
 
   var btn = document.getElementById('submit-btn');
@@ -452,7 +456,7 @@ async function submitToSheet() {
   var tipsOut = Math.round(tipsPre * 0.85);
   var actual  = getTotal();
   var toEnvelope = Math.round(cash - tipsOut);
-  var expected = fl + toEnvelope;
+  var expected = fl + cash;
   var variance = actual - expected;
   var ackBox = document.getElementById('ack-checkbox');
   var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
@@ -478,9 +482,9 @@ function copyReport() {
   var tipsPre = parseFloat(document.getElementById('tips-pretax').value)||0;
   var tipsOut = Math.round(tipsPre * 0.85);
   var actual  = getTotal();
-  var expected = fl + cash - tipsOut;
+  var expected = fl + cash;
   var variance = actual - expected;
-  var status = Math.abs(variance)<=5?'✅ Balanced':variance<0?'⚠️ Short':'✅ OK';
+  var status = variance === 0 ? '✅ Balanced' : variance < 0 ? '⚠️ Short' : '✅ OK';
   var text =
     'TILL CLOSE — '+(document.getElementById('date').value||'—')+'\nStaff: '+(document.getElementById('staff').value||'—')+'\n'+status+
     '\n\nOpening float:       '+fmt(fl)+
