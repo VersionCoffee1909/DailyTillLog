@@ -408,23 +408,25 @@ function buildSummary() {
   document.getElementById('s-actual').textContent    = fmt(actual);
   document.getElementById('s-notes-txt').textContent = document.getElementById('notes').value||'—';
 
+  var toEnvelope = Math.round(cash - tipsOut);
+  var aboveFloat = Math.round(actual - fl);
   var vc = document.getElementById('variance-card');
   vc.className = 'variance-card';
   if(Math.abs(variance)<=5){
-    document.getElementById('variance-display').textContent = fmt(cash);
+    document.getElementById('variance-display').textContent = fmt(toEnvelope);
     vc.classList.add('ok');
-    document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-label').textContent='To safe';
+    document.getElementById('variance-msg').textContent='Tip card (all day): '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
   } else if(variance<0){
-    document.getElementById('variance-display').textContent = fmt(actual);
+    document.getElementById('variance-display').textContent = fmt(toEnvelope);
     vc.classList.add('warn');
-    document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Short: '+fmt(Math.abs(variance))+' must be paid by staff.';
+    document.getElementById('variance-label').textContent='To safe';
+    document.getElementById('variance-msg').textContent='⚠️ Current in till: '+fmt(aboveFloat)+' · Short: '+fmt(Math.abs(variance))+' — must be settled with Tatiana · Tip card (all day): '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
   } else {
-    document.getElementById('variance-display').textContent = fmt(actual);
+    document.getElementById('variance-display').textContent = fmt(toEnvelope);
     vc.classList.add('ok');
-    document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-label').textContent='To safe';
+    document.getElementById('variance-msg').textContent='Extra cash tips: '+fmt(variance)+' (take out too) · Tip card (all day): '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
   }
 
   var btn = document.getElementById('submit-btn');
