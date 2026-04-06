@@ -215,6 +215,14 @@
         <input type="number" class="pos-input" id="cash-sales" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
       </div>
       <div class="pos-row">
+        <span class="pos-label">Tips before tax (CZK)</span>
+        <input type="number" class="pos-input" id="tips-pretax" placeholder="0" min="0" step="1" inputmode="numeric" pattern="[0-9]*" oninput="updateExpected()" />
+      </div>
+      <div class="pos-row">
+        <span class="pos-label">Tips cashed out (−15%)</span>
+        <span class="pos-val" id="tips-cashout">0 CZK</span>
+      </div>
+      <div class="pos-row">
         <span class="pos-label">Total</span>
         <span class="pos-val" id="pos-total">0 CZK</span>
       </div>
@@ -254,7 +262,8 @@
       <div class="breakdown-row"><span class="breakdown-key">Opening float</span><span class="breakdown-val" id="s-float"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Cash sales (POS)</span><span class="breakdown-val" id="s-cash"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Card sales (POS)</span><span class="breakdown-val" id="s-card"></span></div>
-      <div class="breakdown-row"><span class="breakdown-key">Tips</span><span class="breakdown-val" id="s-tips"></span></div>
+      <div class="breakdown-row"><span class="breakdown-key">Tips before tax</span><span class="breakdown-val" id="s-tips-pretax"></span></div>
+      <div class="breakdown-row"><span class="breakdown-key">Tips cashed out (−15%)</span><span class="breakdown-val" id="s-tips"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Banknotes counted</span><span class="breakdown-val" id="s-notes-sub"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Coins counted</span><span class="breakdown-val" id="s-coins-sub"></span></div>
       <div class="breakdown-row"><span class="breakdown-key">Expected in till</span><span class="breakdown-val" id="s-expected"></span></div>
@@ -340,12 +349,15 @@ function updateRunning() {
   updateExpected();
 }
 function updateExpected() {
-  var cash = parseFloat(document.getElementById('cash-sales').value)||0;
-  var card = parseFloat(document.getElementById('card-sales').value)||0;
-  var fl   = parseFloat(document.getElementById('float').value)||0;
-  document.getElementById('expected-till').textContent = fmt(fl+cash);
+  var cash      = parseFloat(document.getElementById('cash-sales').value)||0;
+  var card      = parseFloat(document.getElementById('card-sales').value)||0;
+  var tipsPre   = parseFloat(document.getElementById('tips-pretax').value)||0;
+  var tipsOut   = Math.round(tipsPre * 0.85);
+  var fl        = parseFloat(document.getElementById('float').value)||0;
+  document.getElementById('tips-cashout').textContent = fmt(tipsOut);
+  document.getElementById('expected-till').textContent = fmt(fl + cash - tipsOut);
   document.getElementById('actual-display').textContent = fmt(getTotal());
-  document.getElementById('pos-total').textContent = fmt(cash+card);
+  document.getElementById('pos-total').textContent = fmt(cash + card);
 }
 
 function buildTable() {
@@ -374,25 +386,27 @@ function buildTable() {
 }
 
 function buildSummary() {
-  var fl   = parseFloat(document.getElementById('float').value)||0;
-  var cash = parseFloat(document.getElementById('cash-sales').value)||0;
-  var card = parseFloat(document.getElementById('card-sales').value)||0;
+  var fl       = parseFloat(document.getElementById('float').value)||0;
+  var cash     = parseFloat(document.getElementById('cash-sales').value)||0;
+  var card     = parseFloat(document.getElementById('card-sales').value)||0;
+  var tipsPre  = parseFloat(document.getElementById('tips-pretax').value)||0;
+  var tipsOut  = Math.round(tipsPre * 0.85);
   var actual   = getTotal();
-  var expected = fl+cash;
-  var variance = actual-expected;
-  var tips     = variance > 5 ? variance : 0;
+  var expected = fl + cash - tipsOut;
+  var variance = actual - expected;
 
-  document.getElementById('s-date').textContent     = document.getElementById('date').value||'—';
-  document.getElementById('s-staff').textContent    = document.getElementById('staff').value||'—';
-  document.getElementById('s-float').textContent    = fmt(fl);
-  document.getElementById('s-cash').textContent     = fmt(cash);
-  document.getElementById('s-card').textContent     = fmt(card);
-  document.getElementById('s-tips').textContent     = tips > 0 ? fmt(tips) : '—';
-  document.getElementById('s-notes-sub').textContent= fmt(getNotesTotal());
-  document.getElementById('s-coins-sub').textContent= fmt(getCoinsTotal());
-  document.getElementById('s-expected').textContent = fmt(expected);
-  document.getElementById('s-actual').textContent   = fmt(actual);
-  document.getElementById('s-notes-txt').textContent= document.getElementById('notes').value||'—';
+  document.getElementById('s-date').textContent      = document.getElementById('date').value||'—';
+  document.getElementById('s-staff').textContent     = document.getElementById('staff').value||'—';
+  document.getElementById('s-float').textContent     = fmt(fl);
+  document.getElementById('s-cash').textContent      = fmt(cash);
+  document.getElementById('s-card').textContent      = fmt(card);
+  document.getElementById('s-tips-pretax').textContent = tipsPre > 0 ? fmt(tipsPre) : '—';
+  document.getElementById('s-tips').textContent      = tipsOut > 0 ? fmt(tipsOut) : '—';
+  document.getElementById('s-notes-sub').textContent = fmt(getNotesTotal());
+  document.getElementById('s-coins-sub').textContent = fmt(getCoinsTotal());
+  document.getElementById('s-expected').textContent  = fmt(expected);
+  document.getElementById('s-actual').textContent    = fmt(actual);
+  document.getElementById('s-notes-txt').textContent = document.getElementById('notes').value||'—';
 
   var vc = document.getElementById('variance-card');
   vc.className = 'variance-card';
@@ -400,17 +414,17 @@ function buildSummary() {
     document.getElementById('variance-display').textContent = fmt(cash);
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips: 0 CZK · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
   } else if(variance<0){
-    document.getElementById('variance-display').textContent = fmt(cash+variance);
+    document.getElementById('variance-display').textContent = fmt(actual);
     vc.classList.add('warn');
     document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips: 0 CZK · Staff must pay: '+fmt(Math.abs(variance));
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Short: '+fmt(Math.abs(variance))+' must be paid by staff.';
   } else {
-    document.getElementById('variance-display').textContent = fmt(cash+tips);
+    document.getElementById('variance-display').textContent = fmt(actual);
     vc.classList.add('ok');
     document.getElementById('variance-label').textContent='Current state';
-    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips: '+fmt(tips)+' · Float '+fmt(fl)+' stays in till.';
+    document.getElementById('variance-msg').textContent='To safe: '+fmt(cash)+' · Tips cashed out: '+fmt(tipsOut)+' · Float '+fmt(fl)+' stays in till.';
   }
 
   var btn = document.getElementById('submit-btn');
@@ -432,18 +446,22 @@ async function submitToSheet() {
   if(!scriptUrl) return;
   var btn = document.getElementById('submit-btn');
   btn.textContent='Sending...'; btn.className='submit-btn sending'; btn.disabled=true;
-  var fl   = parseFloat(document.getElementById('float').value)||0;
-  var cash = parseFloat(document.getElementById('cash-sales').value)||0;
-  var card = parseFloat(document.getElementById('card-sales').value)||0;
-  var actual=getTotal(), expected=fl+cash, variance=actual-expected;
-  var tips = variance > 5 ? variance : 0;
+  var fl      = parseFloat(document.getElementById('float').value)||0;
+  var cash    = parseFloat(document.getElementById('cash-sales').value)||0;
+  var card    = parseFloat(document.getElementById('card-sales').value)||0;
+  var tipsPre = parseFloat(document.getElementById('tips-pretax').value)||0;
+  var tipsOut = Math.round(tipsPre * 0.85);
+  var actual  = getTotal();
+  var expected = fl + cash - tipsOut;
+  var variance = actual - expected;
   var ackBox = document.getElementById('ack-checkbox');
   var acknowledged = ackBox && ackBox.checked ? 'Yes' : 'N/A';
-  var status=Math.abs(variance)<=5?'OK':variance<0?'Short':'OK';
+  var status = Math.abs(variance)<=5?'OK':variance<0?'Short':'OK';
   try {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
-        float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),tips:Math.round(tips),
+        float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),
+        tipsPretax:Math.round(tipsPre),tipsOut:tipsOut,
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
         status:status,acknowledged:acknowledged,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
@@ -454,15 +472,26 @@ async function submitToSheet() {
 }
 
 function copyReport() {
-  var fl=parseFloat(document.getElementById('float').value)||0;
-  var cash=parseFloat(document.getElementById('cash-sales').value)||0;
-  var card=parseFloat(document.getElementById('card-sales').value)||0;
-  var actual=getTotal(),expected=fl+cash,variance=actual-expected;
-  var status=Math.abs(variance)<=5?'✅ Balanced':variance<0?'⚠️ Short':'⚠️ Over';
-  var text='TILL CLOSE — '+(document.getElementById('date').value||'—')+'\nStaff: '+(document.getElementById('staff').value||'—')+'\n'+status+
-    '\n\nOpening float:     '+fmt(fl)+'\nCash sales (POS):  '+fmt(cash)+'\nCard sales (POS):  '+fmt(card)+
-    '\nExpected in till:  '+fmt(expected)+'\nActual counted:    '+fmt(actual)+
-    '\nVariance:          '+(variance>=0?'+':'')+fmt(variance)+'\n\nNotes: '+(document.getElementById('notes').value||'—');
+  var fl      = parseFloat(document.getElementById('float').value)||0;
+  var cash    = parseFloat(document.getElementById('cash-sales').value)||0;
+  var card    = parseFloat(document.getElementById('card-sales').value)||0;
+  var tipsPre = parseFloat(document.getElementById('tips-pretax').value)||0;
+  var tipsOut = Math.round(tipsPre * 0.85);
+  var actual  = getTotal();
+  var expected = fl + cash - tipsOut;
+  var variance = actual - expected;
+  var status = Math.abs(variance)<=5?'✅ Balanced':variance<0?'⚠️ Short':'✅ OK';
+  var text =
+    'TILL CLOSE — '+(document.getElementById('date').value||'—')+'\nStaff: '+(document.getElementById('staff').value||'—')+'\n'+status+
+    '\n\nOpening float:       '+fmt(fl)+
+    '\nCash sales (POS):    '+fmt(cash)+
+    '\nCard sales (POS):    '+fmt(card)+
+    '\nTips before tax:     '+fmt(tipsPre)+
+    '\nTips cashed out:     '+fmt(tipsOut)+
+    '\nExpected in till:    '+fmt(expected)+
+    '\nActual counted:      '+fmt(actual)+
+    '\nVariance:            '+(variance>=0?'+':'')+fmt(variance)+
+    '\n\nNotes: '+(document.getElementById('notes').value||'—');
   navigator.clipboard.writeText(text).then(function(){
     var b=document.querySelector('.copy-btn'); b.textContent='Copied!';
     setTimeout(function(){ b.textContent='Copy report to clipboard'; },2000);
@@ -527,7 +556,7 @@ function goTo(n) {
 }
 
 function resetAll() {
-  ['staff','float','card-sales','cash-sales','notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['staff','float','card-sales','cash-sales','tips-pretax','notes'].forEach(function(id){ document.getElementById(id).value=''; });
   document.querySelectorAll('.denom-qty').forEach(function(el){ el.value=''; });
   document.querySelectorAll('.denom-subtotal').forEach(function(el){ el.textContent='—'; el.className='denom-subtotal'; });
   document.getElementById('date').value=getLocalDate();
