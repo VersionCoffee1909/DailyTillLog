@@ -466,6 +466,7 @@ async function submitToSheet() {
     await fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({date:document.getElementById('date').value,staff:document.getElementById('staff').value,
         float:Math.round(fl),cashSales:Math.round(cash),cardSales:Math.round(card),
+        tipsPretax:Math.round(tipsPre),tipsOut:tipsOut,toSafe:toEnvelope,
         expected:Math.round(expected),actual:Math.round(actual),variance:Math.round(variance),
         status:status,cashTips:cashTips,acknowledged:acknowledged,notes:document.getElementById('notes').value||''})});
     btn.textContent='✓ Submitted & logged'; btn.className='submit-btn sent';
